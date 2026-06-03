@@ -3,258 +3,448 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sakhar Sarkar Dip | Web Profile</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Enterprise Database with Photo Upload & Edit</title>
     <style>
-        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; padding: 30px 15px; scroll-behavior: smooth; }
+        .container { max-width: 1300px; margin: 0 auto; }
+        
+        /* Premium Header */
+        header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 40px 20px; border-radius: 20px; margin-bottom: 40px; box-shadow: 0 10px 25px -5px rgba(15,23,42,0.15); color: white; text-align: center; position: relative; overflow: hidden; }
+        header h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 10px; background: linear-gradient(to right, #ffffff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header p { color: #94a3b8; font-size: 15px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .pulse-dot { display: inline-block; width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981; animation: pulse 2s infinite; }
+        .counter-badge { display: inline-block; margin-top: 20px; background: rgba(255,255,255,0.05); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); padding: 6px 18px; border-radius: 30px; font-size: 13px; font-weight: 600; color: #38bdf8; }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Form Styling */
+        .form-section { background: white; padding: 25px; border-radius: 16px; margin-bottom: 40px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 6px solid #10b981; transition: all 0.3s ease; }
+        .form-section.editing-mode { border-left: 6px solid #f59e0b; background-color: #fffbeb; }
+        .form-section h2 { margin-bottom: 20px; font-size: 20px; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;}
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 5px; text-transform: uppercase; }
+        .form-group input, .form-group select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus { border-color: #10b981; }
+        .form-group input:disabled { background-color: #e2e8f0; cursor: not-allowed; }
+        
+        .form-group input[type="file"] { padding: 7px; background: #f8fafc; cursor: pointer; }
+
+        .submit-btn { background: #10b981; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .submit-btn:hover { background: #059669; }
+        .submit-btn.edit-mode { background: #f59e0b; }
+        .submit-btn.edit-mode:hover { background: #d97706; }
+        
+        .cancel-btn { background: #94a3b8; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px; margin-left: 10px; display: none; }
+        .cancel-btn:hover { background: #64748b; }
+
+        /* Search Box */
+        .search-box { max-width: 600px; margin: 0 auto 30px auto; }
+        .search-box input { width: 100%; padding: 14px 25px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 50px; outline: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .search-box input:focus { border-color: #2563eb; }
+
+        /* Grid Layout & Cards */
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 25px; }
+        .card { background: white; border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-top: 6px solid #2563eb; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #f1f5f9; background: #e2e8f0; }
+        .card .id-badge { display: inline-block; background: #dbeafe; color: #1e40af; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; }
+        .card h3 { font-size: 18px; color: #0f172a; margin-bottom: 4px; }
+        .card .designation { font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; }
+        .card .quick-info { text-align: left; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; }
+        
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .view-btn { flex: 1; min-width: 80px; background: #2563eb; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .view-btn:hover { background: #1d4ed8; }
+        .edit-btn { flex: 1; min-width: 80px; background: #f59e0b; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .edit-btn:hover { background: #d97706; }
+        .del-btn { flex: 1; min-width: 80px; background: #ef4444; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .del-btn:hover { background: #dc2626; }
+
+        /* Pagination */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 40px; margin-bottom: 20px; }
+        .page-btn { background: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #pageInfo { font-weight: 600; color: #475569; }
+
+        /* Popup Modal System */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 800px; border-radius: 16px; padding: 30px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; color: #64748b; }
+        .modal-header { display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 20px; }
+        .modal-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; background: #e2e8f0; border: 3px solid #f1f5f9; }
+        .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+        .section-title { grid-column: 1 / -1; font-size: 15px; color: #2563eb; font-weight: 700; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px; margin-top: 10px; text-transform: uppercase; }
+        .data-item { font-size: 14px; }
+        .data-item strong { color: #475569; display: block; font-size: 12px; text-transform: uppercase; margin-bottom: 2px; }
+        .data-item span { color: #0f172a; font-weight: 500; }
+        .no-data { grid-column: 1/-1; text-align: center; color: #64748b; font-size: 18px; padding: 40px; display: none; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased">
+<body>
 
-    <div class="bg-[#0B0F19] text-white relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
-        
-        <nav class="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center relative z-10">
-            <div class="text-2xl font-bold tracking-tight">Sakhar<span class="text-purple-500">.</span></div>
-            <div class="hidden md:flex space-x-8 text-sm font-semibold text-gray-300">
-                <a href="#about" class="hover:text-white transition">About</a>
-                <a href="#experience" class="hover:text-white transition">Experience</a>
-                <a href="#education" class="hover:text-white transition">Education</a>
-                <a href="#skills" class="hover:text-white transition">Skills</a>
-            </div>
-            <a href="#contact" class="bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2 rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition">Contact Me</a>
-        </nav>
+<div class="container">
+    <header>
+        <h1>Office Staff Database Portal</h1>
+        <p><span class="pulse-dot"></span> Enterprise Big Data Management System</p>
+        <div class="counter-badge">
+            Total Registered Members: <span id="staffCounter" style="font-weight: 800; color: #ffffff;">0</span>
+        </div>
+    </header>
 
-        <header class="max-w-7xl mx-auto px-6 py-20 md:py-28 flex flex-col-reverse md:flex-row items-center gap-12 relative z-10" id="about">
-            <div class="md:w-3/5">
-                <p class="text-purple-400 font-semibold tracking-wider uppercase text-sm mb-3">Finance & Corporate Operations</p>
-                <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-6">
-                    Sakhar Sarkar <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Dip</span>
-                </h1>
-                <h2 class="text-xl text-gray-300 font-medium mb-4">Career Objective</h2>
-                <p class="text-gray-400 text-base mb-10 leading-relaxed max-w-xl">
-                    Intended to join an institute where opportunities of sharing knowledge, developing skills, working with a strong sense of responsibility and commitment, and enhancing knowledge through practical activities exist in order to gain strong experiences in relevant fields as well as to develop a career with honesty, dignity, and morality.
-                </p>
-                <div class="flex flex-wrap gap-4">
-                    <a href="#contact" class="bg-white text-gray-900 px-8 py-3.5 rounded-full font-bold hover:bg-gray-100 transition">Get in Touch</a>
+    <div class="form-section" id="formSection">
+        <h2 id="formTitle">Register New Staff Profile</h2>
+        <form id="staffForm" onsubmit="addNewStaff(event)">
+            <div class="form-grid">
+                <div class="form-group"><label>Staff ID</label><input type="text" id="s_id" placeholder="e.g. STF-1001" required></div>
+                <div class="form-group"><label>Full Name</label><input type="text" id="s_name" placeholder="Full Name" required></div>
+                <div class="form-group"><label>Designation</label><input type="text" id="s_design" placeholder="e.g. Account Executive" required></div>
+                
+                <div class="form-group"><label>Staff Photo</label><input type="file" id="s_photo" accept="image/*"></div>
+                
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="s_category">
+                        <option value="Permanent">Permanent</option>
+                        <option value="Probation">Probation</option>
+                        <option value="Contractual">Contractual</option>
+                    </select>
                 </div>
+                <div class="form-group"><label>Joining Date</label><input type="date" id="s_joinDate" required></div>
+                <div class="form-group"><label>Office Contact</label><input type="text" id="s_offContact" placeholder="017XXXXXXXX"></div>
+                <div class="form-group"><label>Personal Contact</label><input type="text" id="s_perContact" placeholder="01XXXXXXXXX" required></div>
+                <div class="form-group"><label>NID Number</label><input type="text" id="s_nid" placeholder="National ID"></div>
+                <div class="form-group"><label>Blood Group</label><input type="text" id="s_blood" placeholder="A+, B-, etc."></div>
+                <div class="form-group"><label>Last Education</label><input type="text" id="s_edu" placeholder="Last Education"></div>
+                <div class="form-group"><label>Marital Status</label><input type="text" id="s_marital" placeholder="Single / Married"></div>
+                <div class="form-group"><label>Father's Name</label><input type="text" id="s_father"></div>
+                <div class="form-group"><label>Mother's Name</label><input type="text" id="s_mother"></div>
+                <div class="form-group"><label>Guardian Name</label><input type="text" id="s_guardian"></div>
+                <div class="form-group"><label>Guardian Mobile</label><input type="text" id="s_gContact"></div>
+                <div class="form-group"><label>Guardian Relation</label><input type="text" id="s_gRelation"></div>
             </div>
-            <div class="md:w-2/5 flex justify-center">
-                <div class="relative w-72 h-80">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-purple-600 to-blue-500 rounded-2xl transform translate-x-4 translate-y-4 opacity-50 blur-lg"></div>
-                    <img src="IMG_20260527_101411.png" alt="Sakhar Sarkar Dip" class="relative rounded-2xl shadow-2xl w-full h-full object-cover border border-gray-800" onerror="this.src='https://via.placeholder.com/300x400/1a1a2e/8a2be2?text=Photo'">
-                </div>
+            
+            <div class="form-grid">
+                <div class="form-group" style="grid-column: span 2;"><label>Present Address (District, Thana, Details)</label><input type="text" id="s_presAddr" placeholder="District, Thana, Details" required></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Permanent Address (District, Thana, Details)</label><input type="text" id="s_permAddr" placeholder="District, Thana, Details" required></div>
             </div>
-        </header>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="submit-btn" id="submitBtn">+ Save Staff Profile</button>
+                <button type="button" class="cancel-btn" id="cancelBtn" onclick="cancelEdit()">Cancel Edit</button>
+            </div>
+        </form>
     </div>
 
-    <section id="experience" class="py-24 bg-white">
-        <div class="max-w-5xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <p class="text-purple-600 font-bold uppercase tracking-wide text-sm mb-2">Professional Journey</p>
-                <h2 class="text-4xl font-bold text-gray-900">Working Experience</h2>
-            </div>
+    <div class="search-box">
+        <input type="text" id="mainSearch" placeholder="Instant Search by Name, ID, Category or Address..." onkeyup="handleSearch()">
+    </div>
 
-            <div class="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-purple-200 before:to-transparent">
-                
-                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-indigo-600 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-white border border-gray-100 shadow-xl hover:-translate-y-1 transition duration-300 relative z-10">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-bold text-gray-900 text-xl">Trainee Executive</h3>
-                            <span class="text-xs font-bold px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full shadow-sm">Feb 2026 - Present</span>
-                        </div>
-                        <p class="text-sm text-indigo-600 font-semibold mb-1">PRAN RFL Group</p>
-                        <p class="text-xs text-gray-500 mb-4">Distribution & Logistics Dept. • Chattogram</p>
-                        <ul class="text-sm text-gray-600 space-y-2 list-disc pl-4">
-                            <li>Overseeing regional distribution workflows and supply chain coordination.</li>
-                            <li>Supporting large-scale logistics operations and data management.</li>
-                            <li>Bridging corporate operational goals with practical distribution efficiency.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-purple-600 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-white border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition duration-300 relative z-10">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-bold text-gray-900 text-xl">Broker Support Officer</h3>
-                            <span class="text-xs font-bold px-3 py-1 bg-purple-50 text-purple-600 rounded-full">Aug 2023 - Dec 2024</span>
-                        </div>
-                        <p class="text-sm text-purple-600 font-semibold mb-1">Make Hub</p>
-                        <p class="text-xs text-gray-500 mb-4">97, Dainik Barta Complex, Rajshahi</p>
-                        <ul class="text-sm text-gray-600 space-y-2 list-disc pl-4">
-                            <li>Organizing warranties, insurance, and supporting documents for settlement.</li>
-                            <li>Participating in team workshops and professional development.</li>
-                            <li>Establishing and maintaining referral networks.</li>
-                            <li>Identifying opportunities where available and adapting to new requirements.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-blue-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-white border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition duration-300 relative z-10">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-bold text-gray-900 text-xl">Internship</h3>
-                            <span class="text-xs font-bold px-3 py-1 bg-blue-50 text-blue-600 rounded-full">Aug 2022 - Nov 2022</span>
-                        </div>
-                        <p class="text-sm text-blue-600 font-semibold mb-1">Union Bank Ltd. (General Banking)</p>
-                        <p class="text-xs text-gray-500 mb-4">Smart Plaza, Jahaj Company, Rangpur</p>
-                        <p class="text-sm text-gray-600 leading-relaxed">
-                            <strong>Responsibility:</strong> Customer Management, Account Opening and Closing, Contact with Customers, Cash Management & utilizing Ababil Software.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
+    <div class="grid-layout" id="staffGrid">
         </div>
-    </section>
 
-    <section id="education" class="py-24 bg-purple-50/50">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
-                
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-purple-600 pl-4">Academic Qualification</h2>
-                    <div class="space-y-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-purple-500">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="font-bold text-gray-900">Master of Business Administration <span class="text-purple-600">(MBA in Finance)</span></h3>
-                                <span class="text-sm font-bold text-gray-400">2024</span>
-                            </div>
-                            <p class="text-sm text-gray-600 mb-2">University of Rajshahi</p>
-                            <p class="text-sm font-semibold text-gray-900 bg-gray-50 inline-block px-3 py-1 rounded">CGPA: 3.08</p>
-                        </div>
-                        
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-blue-500">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="font-bold text-gray-900">Bachelor of Business Administration <span class="text-blue-600">(BBA in Finance)</span></h3>
-                                <span class="text-sm font-bold text-gray-400">2022</span>
-                            </div>
-                            <p class="text-sm text-gray-600 mb-2">Bangladesh Army University of Science and Technology (BAUST)</p>
-                            <p class="text-sm font-semibold text-gray-900 bg-gray-50 inline-block px-3 py-1 rounded">CGPA: 3.04</p>
-                        </div>
+    <div class="pagination">
+        <button class="page-btn" id="prevBtn" onclick="changePage(-1)">Previous</button>
+        <span id="pageInfo">Page 1 of 1</span>
+        <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next</button>
+    </div>
+</div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                                <h3 class="font-bold text-gray-900 mb-1 text-sm">HSC <span class="text-purple-500 font-normal">(2017)</span></h3>
-                                <p class="text-xs text-gray-500 mb-2 line-clamp-1" title="Lalmonirhat Government College">Lalmonirhat Govt. College</p>
-                                <p class="text-xs font-semibold text-gray-800">GPA: 3.42</p>
-                            </div>
-                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                                <h3 class="font-bold text-gray-900 mb-1 text-sm">SSC <span class="text-blue-500 font-normal">(2015)</span></h3>
-                                <p class="text-xs text-gray-500 mb-2 line-clamp-1" title="Lalmonirhat Government High School">Lalmonirhat Govt. High School</p>
-                                <p class="text-xs font-semibold text-gray-800">GPA: 3.83</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="modal" id="profileModal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div id="modalDataContainer"></div>
+    </div>
+</div>
 
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-indigo-600 pl-4">Achievements & Details</h2>
-                    
-                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-8 rounded-2xl shadow-lg text-white mb-8">
-                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                            <span class="text-2xl">🏆</span>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-2">3rd Position</h3>
-                        <p class="font-medium text-purple-100 mb-1">MindMerge 2020 (BAUST)</p>
-                        <p class="text-sm text-purple-200">The business case study program</p>
-                    </div>
+<script>
+    // 1. Initialize Database
+    let defaultData = {
+        "STF-01": { id: "STF-01", name: "Md. Rakibul Islam", design: "Senior Executive", category: "Permanent", joinDate: "2024-01-12", offContact: "01711-XXXXXX", perContact: "01911-XXXXXX", nid: "1995XXXXXXXXX", blood: "B+", edu: "MBA", marital: "Married", father: "Md. Abul Kashem", mother: "Rokeya Begum", guardian: "Md. Abul Kashem", gContact: "01811-XXXXXX", gRelation: "Father", presAddr: "Dhaka, Mirpur", permAddr: "Bogura, Sherpur", photo: "" }
+    };
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-gray-900 mb-4 text-lg">Languages</h3>
-                        <div class="space-y-4 text-sm">
-                            <div class="flex">
-                                <span class="w-24 font-bold text-purple-600">Bangla:</span>
-                                <span class="text-gray-600">Native speaker, skilled technical writer.</span>
-                            </div>
-                            <div class="flex">
-                                <span class="w-24 font-bold text-purple-600">English:</span>
-                                <span class="text-gray-600">Good Understand, Spoken & Writing Skill.</span>
-                            </div>
-                            <div class="flex">
-                                <span class="w-24 font-bold text-purple-600">Hindi:</span>
-                                <span class="text-gray-600">Good Understand, Spoken.</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    let staffDatabase = JSON.parse(localStorage.getItem('photoStaffData'));
+    if (!staffDatabase || Object.keys(staffDatabase).length === 0) {
+        staffDatabase = defaultData;
+        localStorage.setItem('photoStaffData', JSON.stringify(staffDatabase));
+    }
 
-    <section id="skills" class="py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <p class="text-blue-600 font-bold uppercase tracking-wide text-sm mb-2">Capabilities</p>
-                <h2 class="text-4xl font-bold text-gray-900">Technical & Software Skills</h2>
-            </div>
-            <div class="flex flex-wrap justify-center gap-4">
-                <span class="px-6 py-3 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-gray-700 hover:border-purple-500 hover:text-purple-600 transition cursor-default">Ababil Software (Union Bank)</span>
-                <span class="px-6 py-3 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-gray-700 hover:border-blue-500 hover:text-blue-600 transition cursor-default">Microsoft Excel</span>
-                <span class="px-6 py-3 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-gray-700 hover:border-purple-500 hover:text-purple-600 transition cursor-default">Microsoft PowerPoint</span>
-                <span class="px-6 py-3 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-gray-700 hover:border-blue-500 hover:text-blue-600 transition cursor-default">Microsoft Word</span>
-                <span class="px-6 py-3 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-gray-700 hover:border-purple-500 hover:text-purple-600 transition cursor-default">Outlook</span>
-            </div>
-        </div>
-    </section>
+    let filteredKeys = [];
+    let currentPage = 1;
+    const cardsPerPage = 12;
+    
+    // State variables for Editing
+    let isEditing = false;
+    let currentEditId = null;
 
-    <footer id="contact" class="bg-[#050810] text-gray-400 py-16 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-6">
+    window.onload = function() { initDatabase(); };
+
+    function initDatabase() {
+        filteredKeys = Object.keys(staffDatabase);
+        updateCounter();
+        renderPage();
+    }
+
+    function updateCounter() {
+        document.getElementById('staffCounter').innerText = Object.keys(staffDatabase).length;
+    }
+
+    // 2. Process Image file & submit logic (Handles both NEW and EDIT)
+    function addNewStaff(e) {
+        e.preventDefault();
+        const id = document.getElementById('s_id').value.trim().toUpperCase();
+        
+        // Prevent overwriting if adding a new profile
+        if(!isEditing && staffDatabase[id]) {
+            alert("This Staff ID already exists! Please use a unique ID.");
+            return;
+        }
+
+        const photoFile = document.getElementById('s_photo').files[0];
+        
+        if (photoFile) {
+            // New photo uploaded
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                saveDataStructure(id, reader.result);
+            }
+            reader.readAsDataURL(photoFile);
+        } else {
+            // No new photo. If editing, keep old photo. If new, save empty.
+            const existingPhoto = isEditing ? staffDatabase[id].photo : "";
+            saveDataStructure(id, existingPhoto);
+        }
+    }
+
+    function saveDataStructure(id, imageBase64) {
+        staffDatabase[id] = {
+            id: id,
+            name: document.getElementById('s_name').value,
+            design: document.getElementById('s_design').value,
+            category: document.getElementById('s_category').value,
+            joinDate: document.getElementById('s_joinDate').value,
+            offContact: document.getElementById('s_offContact').value || "N/A",
+            perContact: document.getElementById('s_perContact').value,
+            nid: document.getElementById('s_nid').value || "N/A",
+            blood: document.getElementById('s_blood').value || "N/A",
+            edu: document.getElementById('s_edu').value || "N/A",
+            marital: document.getElementById('s_marital').value || "N/A",
+            father: document.getElementById('s_father').value || "N/A",
+            mother: document.getElementById('s_mother').value || "N/A",
+            guardian: document.getElementById('s_guardian').value || "N/A",
+            gContact: document.getElementById('s_gContact').value || "N/A",
+            gRelation: document.getElementById('s_gRelation').value || "N/A",
+            presAddr: document.getElementById('s_presAddr').value,
+            permAddr: document.getElementById('s_permAddr').value,
+            photo: imageBase64 
+        };
+
+        localStorage.setItem('photoStaffData', JSON.stringify(staffDatabase));
+        
+        if(isEditing) {
+            alert("Profile Updated Successfully!");
+            cancelEdit(); // Reset form state
+        } else {
+            alert("New Staff Added Successfully!");
+            document.getElementById('staffForm').reset();
+        }
+        
+        initDatabase(); 
+    }
+
+    // 3. EDIT Functionality
+    function editStaff(id) {
+        const staff = staffDatabase[id];
+        if(!staff) return;
+
+        isEditing = true;
+        currentEditId = id;
+
+        // Fill the form with existing data
+        document.getElementById('s_id').value = staff.id;
+        document.getElementById('s_id').disabled = true; // Cannot edit ID
+        document.getElementById('s_name').value = staff.name;
+        document.getElementById('s_design').value = staff.design;
+        document.getElementById('s_category').value = staff.category;
+        document.getElementById('s_joinDate').value = staff.joinDate;
+        document.getElementById('s_offContact').value = staff.offContact !== "N/A" ? staff.offContact : "";
+        document.getElementById('s_perContact').value = staff.perContact;
+        document.getElementById('s_nid').value = staff.nid !== "N/A" ? staff.nid : "";
+        document.getElementById('s_blood').value = staff.blood !== "N/A" ? staff.blood : "";
+        document.getElementById('s_edu').value = staff.edu !== "N/A" ? staff.edu : "";
+        document.getElementById('s_marital').value = staff.marital !== "N/A" ? staff.marital : "";
+        document.getElementById('s_father').value = staff.father !== "N/A" ? staff.father : "";
+        document.getElementById('s_mother').value = staff.mother !== "N/A" ? staff.mother : "";
+        document.getElementById('s_guardian').value = staff.guardian !== "N/A" ? staff.guardian : "";
+        document.getElementById('s_gContact').value = staff.gContact !== "N/A" ? staff.gContact : "";
+        document.getElementById('s_gRelation').value = staff.gRelation !== "N/A" ? staff.gRelation : "";
+        document.getElementById('s_presAddr').value = staff.presAddr;
+        document.getElementById('s_permAddr').value = staff.permAddr;
+
+        // Change UI to Edit Mode
+        document.getElementById('formTitle').innerText = `Editing Profile: ${staff.name}`;
+        document.getElementById('formSection').classList.add('editing-mode');
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerText = "🔄 Update Profile";
+        submitBtn.classList.add('edit-mode');
+        
+        document.getElementById('cancelBtn').style.display = "block";
+
+        // Scroll up to the form smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        isEditing = false;
+        currentEditId = null;
+        
+        document.getElementById('staffForm').reset();
+        document.getElementById('s_id').disabled = false;
+        
+        // Restore normal UI
+        document.getElementById('formTitle').innerText = "Register New Staff Profile";
+        document.getElementById('formSection').classList.remove('editing-mode');
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerText = "+ Save Staff Profile";
+        submitBtn.classList.remove('edit-mode');
+        
+        document.getElementById('cancelBtn').style.display = "none";
+    }
+
+    // 4. Search Logic
+    function handleSearch() {
+        const query = document.getElementById('mainSearch').value.toLowerCase();
+        filteredKeys = Object.keys(staffDatabase).filter(key => {
+            const staff = staffDatabase[key];
+            const searchStr = `${staff.id} ${staff.name} ${staff.design} ${staff.category} ${staff.presAddr} ${staff.permAddr}`.toLowerCase();
+            return searchStr.includes(query);
+        });
+        currentPage = 1;
+        renderPage();
+    }
+
+    // 5. Render Grid Logic
+    function renderPage() {
+        const grid = document.getElementById('staffGrid');
+        grid.innerHTML = '';
+        
+        if(filteredKeys.length === 0) {
+            grid.innerHTML = '<div class="no-data" style="display:block;">No matching staff found!</div>';
+            document.getElementById('pageInfo').innerText = `Page 0 of 0`;
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = true;
+            return;
+        }
+
+        const totalPages = Math.ceil(filteredKeys.length / cardsPerPage);
+        const startIdx = (currentPage - 1) * cardsPerPage;
+        const endIdx = startIdx + cardsPerPage;
+        const pageKeys = filteredKeys.slice(startIdx, endIdx);
+
+        pageKeys.forEach(key => {
+            const staff = staffDatabase[key];
+            const photoSrc = staff.photo ? staff.photo : 'https://via.placeholder.com/150/e2e8f0/64748b?text=No+Photo';
             
-            <div class="mb-16 border-b border-gray-800 pb-16">
-                <h2 class="text-2xl font-bold text-white mb-8 text-center">Professional References</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-[#101423] p-6 rounded-xl border border-gray-800">
-                        <h3 class="text-lg font-bold text-white mb-1">Md. Zaber Hossain</h3>
-                        <p class="text-sm text-purple-400 mb-3">Assistant Professor & Head of Dept.</p>
-                        <p class="text-sm text-gray-400 mb-1">Bangladesh Army University of Science and Technology (BAUST), Saidpur.</p>
-                        <p class="text-sm text-gray-500 mt-3">📱 01769675568, 01769662726, +8801922626111</p>
-                        <p class="text-sm text-gray-500">✉ headbba@baust.edu.bd, hossain.zaber478@gmail.com</p>
-                    </div>
-                    <div class="bg-[#101423] p-6 rounded-xl border border-gray-800">
-                        <h3 class="text-lg font-bold text-white mb-1">Md. Sohel Rana</h3>
-                        <p class="text-sm text-blue-400 mb-3">Operation Manager</p>
-                        <p class="text-sm text-gray-400 mb-1">Union Bank Ltd. Rangpur Branch.</p>
-                        <p class="text-sm text-gray-500 mt-3">📱 01744989903, 0191599513</p>
-                    </div>
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${photoSrc}" class="avatar" alt="Profile">
+                <div><span class="id-badge">ID: ${staff.id}</span></div>
+                <h3>${staff.name}</h3>
+                <div class="designation">${staff.design}</div>
+                <div class="quick-info">
+                    <div><strong>Contact:</strong> ${staff.offContact !== 'N/A' ? staff.offContact : staff.perContact}</div>
+                    <div><strong>Category:</strong> ${staff.category}</div>
                 </div>
-            </div>
+                <div class="btn-group">
+                    <button class="view-btn" onclick="openModal('${staff.id}')">View</button>
+                    <button class="edit-btn" onclick="editStaff('${staff.id}')">Edit</button>
+                    <button class="del-btn" onclick="deleteStaff('${staff.id}')">Delete</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
-                <div>
-                    <h3 class="text-white font-bold text-lg mb-4">Contact Info</h3>
-                    <p class="mb-2 flex items-center gap-2"><span class="text-purple-500">📱</span> +8801823119666</p>
-                    <p class="mb-2 flex items-center gap-2"><span class="text-purple-500">✉</span> sakhardip@gmail.com</p>
-                    <p class="flex items-center gap-2"><span class="text-purple-500">in</span> LinkedIn</p>
-                </div>
-                <div>
-                    <h3 class="text-white font-bold text-lg mb-4">Current Location</h3>
-                    <p class="leading-relaxed">Sitakunda,<br>Chattogram,<br>Bangladesh</p>
-                </div>
-                <div>
-                    <h3 class="text-white font-bold text-lg mb-4">Personal Details</h3>
-                    <p class="mb-1"><strong>DOB:</strong> April 2, 1998</p>
-                    <p class="mb-1"><strong>Nationality:</strong> Bangladeshi</p>
-                    <p class="mb-1"><strong>Religion:</strong> Hindu</p>
-                </div>
-            </div>
+        document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById('prevBtn').disabled = currentPage === 1;
+        document.getElementById('nextBtn').disabled = currentPage === totalPages;
+    }
 
-            <div class="mt-16 pt-8 border-t border-gray-800 text-center text-sm flex flex-col md:flex-row justify-between items-center gap-4">
-                <p>I hereby declare that all the details mentioned are true to the best of my knowledge.</p>
-                <p>&copy; 2026 Sakhar Sarkar Dip.</p>
+    function changePage(dir) {
+        currentPage += dir;
+        renderPage();
+    }
+
+    function deleteStaff(id) {
+        if(confirm(`Are you sure you want to delete ${id}?`)) {
+            delete staffDatabase[id];
+            localStorage.setItem('photoStaffData', JSON.stringify(staffDatabase));
+            initDatabase();
+        }
+    }
+
+    // 6. Modal Logic
+    function openModal(staffId) {
+        const staff = staffDatabase[staffId];
+        if (!staff) return;
+
+        const photoSrc = staff.photo ? staff.photo : 'https://via.placeholder.com/150/e2e8f0/64748b?text=No+Photo';
+
+        const container = document.getElementById('modalDataContainer');
+        container.innerHTML = `
+            <div class="modal-header">
+                <img src="${photoSrc}" class="modal-avatar" alt="Avatar">
+                <div class="modal-title">
+                    <h2>${staff.name}</h2>
+                    <p style="color: #2563eb; font-weight: 600;">ID: ${staff.id} | ${staff.design}</p>
+                </div>
             </div>
-        </div>
-    </footer>
+            <div class="modal-grid">
+                <div class="section-title">Job & Identity Details</div>
+                <div class="data-item"><strong>Employment Category</strong><span>${staff.category}</span></div>
+                <div class="data-item"><strong>Joining Date</strong><span>${staff.joinDate}</span></div>
+                <div class="data-item"><strong>NID Number</strong><span>${staff.nid}</span></div>
+                <div class="data-item"><strong>Blood Group</strong><span>${staff.blood}</span></div>
+                <div class="data-item"><strong>Last Education</strong><span>${staff.edu}</span></div>
+                <div class="data-item"><strong>Marital Status</strong><span>${staff.marital}</span></div>
+
+                <div class="section-title">Contact Information</div>
+                <div class="data-item"><strong>Office Contact</strong><span>${staff.offContact}</span></div>
+                <div class="data-item"><strong>Personal Contact</strong><span>${staff.perContact}</span></div>
+
+                <div class="section-title">Family & Guardian Details</div>
+                <div class="data-item"><strong>Father's Name</strong><span>${staff.father}</span></div>
+                <div class="data-item"><strong>Mother's Name</strong><span>${staff.mother}</span></div>
+                <div class="data-item"><strong>Guardian's Name</strong><span>${staff.guardian}</span></div>
+                <div class="data-item"><strong>Guardian Contact</strong><span>${staff.gContact}</span></div>
+                <div class="data-item"><strong>Relation with Guardian</strong><span>${staff.gRelation}</span></div>
+
+                <div class="section-title">Present Address</div>
+                <div class="data-item"><strong>Address Details</strong><span>${staff.presAddr}</span></div>
+
+                <div class="section-title">Permanent Address</div>
+                <div class="data-item"><strong>Address Details</strong><span>${staff.permAddr}</span></div>
+            </div>
+        `;
+        document.getElementById('profileModal').style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById('profileModal').style.display = "none";
+    }
+
+    // Close modal when clicking outside content box
+    window.onclick = function(event) {
+        let modal = document.getElementById('profileModal');
+        if (event.target == modal) modal.style.display = "none";
+    }
+</script>
 
 </body>
 </html>
